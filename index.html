@@ -1,1 +1,143 @@
-hello
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Squad Eats
+
+  </title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+
+  
+</head>
+
+<body>
+  <nav class="flex items-center justify-between flex-wrap p-6">
+    <div class="items-center flex-shrink-0 mr-6">
+      <h1 class="font-semibold text-xl tracking-tight">Squad Eats</h1>
+      <h3 class="font-semibold text-l tracking-tight">Help the Squad split the check</h3>
+    </div>
+  </nav>
+
+  <div id="main" class="mb-4 p-6">
+    <div id="mainform"></div>
+    <button onclick="addperson()">Add Squad Member</button>
+    <div>
+      Total Amount: $<input type="number" id="totalamount" min="0" max="9999" step="0.01" onChange="calculate()" oninput="calculate()"/>
+    </div>
+    <div>
+      Whats the Damage: <span id="split"></span>
+    </div>
+  </div>
+  
+  
+  
+
+  <script>
+    people = []
+    num_people = 1
+
+    function get_ammount_form() {
+      return `Amount: $<input type="number" id="costinput" min="0" max="9999" step="0.01" onChange="calculate()" oninput="calculate()"/>`
+
+    }
+
+    function get_form(id){
+      var personform = document.createElement('div'); // is a node
+      af = get_ammount_form()
+      personform.innerHTML = `<div class="w-full" id="form">
+          <span id="formlist-${id}">
+            Person: <input type="text" id="name-${id}" name="name" onChange="calculate()" oninput="calculate()"> 
+            ${af}
+          </span>
+          <button onclick="addamount(${id})">Add Ammount</button>
+        </div>`;
+      return personform
+    }
+
+    document.getElementById("mainform").appendChild(get_form(num_people))
+
+    function addperson() {
+      people.push({
+        name: '',
+        ammount: []
+      })
+      num_people++;
+      console.log(num_people)
+
+      document.getElementById("mainform").appendChild(get_form(num_people))
+
+      console.log(people)
+    }
+
+    function addamount(id) {
+      var personform = document.createElement('span'); // is a node
+      personform.innerHTML = get_ammount_form()
+
+      console.log("formlist-"+id)
+      document.getElementById("formlist-"+id).appendChild(personform)
+
+      console.log("add ammount")
+    }
+
+    function calculate() {
+      
+      total = Number(document.getElementById("totalamount").value)
+
+      var totalspan = document.createElement('span');
+      totalspan.innerHTML = `<div></div>`;
+      e = document.getElementById("split")
+      e.innerHTML = '';
+
+      totals = []
+
+      for (i = 0; i < num_people; i++) {
+        console.log("formlist-"+ (i+1))
+        
+        person = document.getElementById("name-"+ (i+1)).value
+        console.log(person)
+
+        var a = [...document.getElementById("formlist-"+ (i+1)).querySelectorAll('input[type="number"]')].map(x => Number(x.value))
+        console.log(a)
+        var person_total = a.reduce((acc, next) => {
+          return acc + next
+        })
+        console.log(person_total)
+
+        totals.push({
+          name: person,
+          total: person_total
+        })
+
+        
+      }
+      for (i = 0; i < num_people; i++) {
+
+        var all_users_total = totals.reduce((acc, next) => {
+          return acc + next.total
+        }, 0)
+        
+        user_total = totals[i].total
+        console.log(user_total)
+        it = (total / all_users_total) * user_total
+        child = document.createElement('div');
+        v = 0
+        if (total) {
+          v = it.toFixed(2)
+        }
+        child.innerHTML = `${totals[i].name}: $${v}`;
+        totalspan.appendChild(child)
+        e.appendChild(totalspan)
+      }
+   
+    }
+
+
+
+  </script>
+</body>
+</html>
